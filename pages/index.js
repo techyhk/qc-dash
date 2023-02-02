@@ -49,7 +49,7 @@ const Home = () => {
             setLoading(true);
             setInputState("disabled");
             try {
-              socialUrls = await axios.post(`http://localhost:3000/api/pptr`, {
+              socialUrls = await axios.post(`/api/pptr`, {
                 url: search,
               });
               setData(socialUrls.data);
