@@ -7,13 +7,22 @@
   },
   "dependencies": {
     "@hapi/iron": "6.0.0",
+    "@nextui-org/react": "^1.0.0-beta.12",
+    "axios": "^1.2.5",
+    "bcryptjs": "^2.4.3",
     "cookie": "0.4.1",
+    "http-server": "^14.1.1",
+    "mongoose": "^6.8.4",
     "next": "latest",
     "next-connect": "0.8.1",
-    "passport": "^0.4.1",
+    "next-themes": "^0.2.1",
+    "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "psl": "^1.9.0",
+    "puppeteer": "^19.6.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.0",
     "swr": "^2.0.0",
     "uuid": "8.3.1"
   }
