@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const browser = await puppeteer.launch({
       // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
       args: ["--no-sandbox"],
-      headless: false,
+      headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     });
 
