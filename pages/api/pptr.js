@@ -7,8 +7,13 @@ export default async function handler(req, res) {
   try {
     console.log("Puppeteer is running", req.body.url);
     const browser = await puppeteer.launch({
-      // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-      args: ["--no-sandbox"],
+      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      args: ["--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--window-position=0,0",
+        "--ignore-certifcate-errors",
+        "--ignore-certifcate-errors-spki-list"],
+      ignoreDefaultArgs: ["--enable-automation"],
       headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     });
@@ -19,9 +24,10 @@ export default async function handler(req, res) {
     domain = domain[domain.length - 2];
 
     // Fetch privacy policy , terms and conditions and social links from any website
-    await page.goto(`https://${url}`);
+    await page.goto(`https://${url}`, { timeout: 60000 });
     await page.waitForSelector('body');
-    new Promise(r => setTimeout(r, 20000));
+    await mouseJiggler(page);
+    await new Promise(r => setTimeout(r, 20000));
 
     // Fetch privacy policy
     const privacyPolicy = await page.evaluate(() => {
@@ -40,13 +46,13 @@ export default async function handler(req, res) {
 
       const socialLinks = {};
 
-      const facebook = document.querySelector('a[href*="facebook"]');
+      const facebook = document.querySelector('a[href*="facebook.com"]');
       if (facebook) socialLinks.facebook = facebook.href;
 
-      const twitter = document.querySelector('a[href*="twitter"]');
+      const twitter = document.querySelector('a[href*="twitter.com"]');
       if (twitter) socialLinks.twitter = twitter.href;
 
-      const instagram = document.querySelector('a[href*="instagram"]');
+      const instagram = document.querySelector('a[href*="instagram.com"]');
       if (instagram) socialLinks.instagram = instagram.href;
 
       const linkedin = document.querySelector('a[href*="linkedin.com"]');
@@ -96,7 +102,12 @@ export default async function handler(req, res) {
       console.error(err);
     }
 
+    console.log("content Ratio", await adToContentRatio(page));
+    console.log("Google Ads", await googleAds(page));
     await page.screenshot({ path: `./data/${domain}/homepage.png`, fullPage: true });
+    await page.setViewport({ width: 375, height: 667 });
+    await page.reload();
+    await page.screenshot({ path: `./data/${domain}/homepage_mobile.png`, fullPage: true });
 
     console.log("Fetching urls Category");
     let categoryurls = await filterUrls(page, await fetchUrls(page, "li a"), url, "category");
@@ -111,16 +122,22 @@ export default async function handler(req, res) {
       console.log("Opening url Category");
       const page2 = await browser.newPage();
       categoryUrl = await random(categoryurls);
-      await page2.goto(categoryUrl);
+      await page2.goto(categoryUrl, { timeout: 60000 });
       await page2.screenshot({ path: `./data/${domain}/category.png`, fullPage: true });
+      await page2.setViewport({ width: 375, height: 667 });
+      await page2.reload();
+      await page2.screenshot({ path: `./data/${domain}/category_mobile.png`, fullPage: true });
     }
 
     if (articleurls.length > 0) {
       console.log("Opening url Article");
       const page3 = await browser.newPage();
       articleUrl = await random(articleurls);
-      await page3.goto(articleUrl);
+      await page3.goto(articleUrl, { timeout: 60000 });
       await page3.screenshot({ path: `./data/${domain}/article.png`, fullPage: true });
+      await page3.setViewport({ width: 375, height: 667 });
+      await page3.reload();
+      await page3.screenshot({ path: `./data/${domain}/article_mobile.png`, fullPage: true });
     }
     await browser.close();
     console.log("Done");
@@ -297,4 +314,31 @@ async function removeDuplicates(arr) {
 
 async function random(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// advertisment to content ratio of a website (advertisment to content ratio of a website)
+async function adToContentRatio(page) {
+  const adToContentRatio = await page.evaluate(() => {
+    const ads = document.querySelectorAll("iframe[title='Advertisement'], script");
+    const content = document.querySelectorAll("p, h1, h2, h3, h4, h5, h6, a");
+    return (ads.length / content.length) * 100;
+  });
+  return adToContentRatio;
+}
+
+// check if google ads are present on the website
+async function googleAds(page) {
+  const googleAds = await page.evaluate(() => {
+    const ads = document.querySelectorAll("iframe[title='Advertisement']");
+    return ads.length;
+  });
+  return googleAds;
+}
+
+async function mouseJiggler(page) {
+  await page.mouse.move(0, 0);
+  await page.mouse.move(100, 100);
+  await page.mouse.move(200, 200);
+  await page.mouse.move(300, 300);
+  await page.mouse.move(400, 400);
 }
