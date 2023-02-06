@@ -42,7 +42,7 @@ const Home = () => {
               readOnly={inputState === "disabled" ? true : false}
               className="search"
               width="50%"
-              Placeholder="Search"
+              placeholder="Search"
               clearable={inputState === "disabled" ? false : true}
               color="warning"
               onChange={searchHandler}
