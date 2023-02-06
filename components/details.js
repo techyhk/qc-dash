@@ -8,162 +8,443 @@ import {
   Modal,
   Loading,
   Grid,
+  Card,
 } from "@nextui-org/react";
 import { useUser } from "../lib/hooks";
+import { Chart as ChartJS, registerables, scales } from "chart.js";
+import { Bar, Line, Pie } from "react-chartjs-2";
+ChartJS.register(...registerables);
+
+const buttonCss = {
+  borderRadius: "$xl", // radii.xs
+  border: "$space$1 solid transparent",
+  background: "$blue100", // colors.pink800
+  color: "$blue900",
+  height: "$12", // space[12]
+  boxShadow: "$md", // shadows.md
+  "&:hover": {
+    background: "$blue500",
+    color: "$blue900",
+  },
+  "&:active": {
+    background: "$blue200",
+  },
+  "&:focus": {
+    borderColor: "$blue400",
+  },
+};
+
+const chartData = {
+  labels: [],
+  datasets: [
+    {
+      label: "Total Visits",
+      data: [],
+      backgroundColor: [
+        "rgb(47, 105, 253)",
+        "rgb(47, 105, 253)",
+        "rgb(47, 105, 253)",
+      ],
+      borderWidth: 1,
+      maxBarThickness: 60,
+      borderRadius: 10,
+    },
+  ],
+};
+
+const chartOptions = {
+  scales: {
+    x: {
+      grid: {
+        display: false,
+      },
+    },
+    y: {
+      grid: {
+        display: false,
+      },
+    },
+  },
+  maintainAspectRatio: false,
+};
+
+const trafficSourcesData = {
+  labels: [],
+  datasets: [
+    {
+      data: [],
+      backgroundColor: [
+        "#1dcdf6",
+        "#fc3771",
+        "#c24dfc",
+        "#feb72b",
+        "#d2dce8",
+        "#195afe",
+      ],
+      hoverBackgroundColor: [
+        "#1dcdf6",
+        "#fc3771",
+        "#c24dfc",
+        "#feb72b",
+        "#d2dce8",
+        "#195afe",
+      ],
+    },
+  ],
+};
+
+const TopCountrySharesData = {
+  labels: [],
+  datasets: [
+    {
+      data: [],
+      backgroundColor: [
+        "#1dcdf6",
+        "#fc3771",
+        "#c24dfc",
+        "#feb72b",
+        "#d2dce8",
+        "#195afe",
+      ],
+      hoverBackgroundColor: [
+        "#1dcdf6",
+        "#fc3771",
+        "#c24dfc",
+        "#feb72b",
+        "#d2dce8",
+        "#195afe",
+      ],
+    },
+  ],
+};
+
+const similarWebCountryData = {
+  356: "India",
+  840: "United States",
+  124: "Canada",
+  392: "Japan",
+  156: "China",
+  276: "Germany",
+  250: "France",
+  380: "Italy",
+  826: "United Kingdom",
+  554: "New Zealand",
+  528: "Netherlands",
+  702: "Singapore",
+  36: "Australia",
+  458: "Malaysia",
+  410: "South Korea",
+  344: "Hong Kong",
+  446: "Macau",
+  702: "Singapore",
+  840: "United States",
+  682: "Saudi Arabia",
+  784: "United Arab Emirates",
+  704: "Vietnam",
+  643: "Russia",
+  50: "Bangladesh",
+  752: "Sweden",
+  76: "Brazil",
+  634: "Qatar",
+  414: "Kuwait",
+  616: "Poland",
+};
 
 const Details = (props) => {
   const user = useUser();
-  const [screenshotModalIsOpen, setScreenshotModalIsOpen] = React.useState(false);
+  const [screenshotModalIsOpen, setScreenshotModalIsOpen] =
+    React.useState(false);
   const [screenshotData, setScreenshotData] = React.useState(null);
-  let domain = (props.site).replace(/(^\w+:|^)\/\//, '').replace("www.", '');
+
+  let domain = props.site.replace(/(^\w+:|^)\/\//, "").replace("www.", "");
   domain = domain.split(".")[0];
+
+  let totalCountryShares = 0;
+
+  const screenshot = {
+    homePage: {
+      url: `${props.data.homepageUrl}`,
+      desktopScreenShot: `${domain}/homepage.png`,
+      mobileScreenShot: `${domain}/homepage_mobile.png`,
+    },
+    category: {
+      url: `${props.data.categoryUrl}`,
+      desktopScreenShot: `${domain}/category.png`,
+      mobileScreenShot: `${domain}/category_mobile.png`,
+    },
+    article: {
+      url: `${props.data.articleUrl}`,
+      desktopScreenShot: `${domain}/article.png`,
+      mobileScreenShot: `${domain}/article_mobile.png`,
+    },
+  };
+
+  function secondsToMinutes(seconds) {
+    const hour = Math.floor(seconds / 3600);
+    const minutes = Math.floor(seconds / 60);
+    const secondsLeft = seconds % 60;
+    return `${hour} hr ${minutes} m ${secondsLeft} s`;
+  }
+
+  function ConvertDate(date) {
+    const d = new Date(date);
+    const month = d.getMonth() + 1;
+    switch (month) {
+      case 1:
+        return "Jan";
+      case 2:
+        return "Feb";
+      case 3:
+        return "Mar";
+      case 4:
+        return "Apr";
+      case 5:
+        return "May";
+      case 6:
+        return "Jun";
+      case 7:
+        return "Jul";
+      case 8:
+        return "Aug";
+      case 9:
+        return "Sep";
+      case 10:
+        return "Oct";
+      case 11:
+        return "Nov";
+      case 12:
+        return "Dec";
+    }
+  }
+  chartData.labels = [];
+  chartData.datasets[0].data = [];
+  trafficSourcesData.labels = [];
+  trafficSourcesData.datasets[0].data = [];
+  TopCountrySharesData.labels = [];
+  TopCountrySharesData.datasets[0].data = [];
 
   return (
     <>
+      {Object.keys(props.similarWebData.EstimatedMonthlyVisits).forEach(
+        (key) => {
+          chartData.labels.push(ConvertDate(key));
+          chartData.datasets[0].data.push(
+            props.similarWebData.EstimatedMonthlyVisits[key]
+          );
+        }
+      )}
+      {Object.keys(props.similarWebData.TrafficSources).forEach((key) => {
+        trafficSourcesData.labels.push(key);
+        trafficSourcesData.datasets[0].data.push(
+          props.similarWebData.TrafficSources[key] * 100
+        );
+      })}
+      {Object.keys(props.similarWebData.TopCountryShares).forEach((key) => {
+        TopCountrySharesData.labels.push(
+          similarWebCountryData[
+          props.similarWebData.TopCountryShares[key].Country
+          ]
+        );
+        TopCountrySharesData.datasets[0].data.push(
+          props.similarWebData.TopCountryShares[key].Value * 100
+        );
+        totalCountryShares =
+          totalCountryShares +
+          props.similarWebData.TopCountryShares[key].Value * 100;
+      })}
       <Spacer y={2} />
-      <Text h1> Website :{props.site}</Text>
-      <Spacer y={1.5} />
-      {console.log(props.data)}
+      <Text
+        h2
+        css={{
+          textGradient: "45deg, #4ee1ff -20.3%, #0037f5 70.46%",
+        }}
+        weight="bold"
+      >
+        {" "}
+        Website :{props.site}
+      </Text>
+      <Spacer y={1} />
       <Grid.Container gap={2} justify="center">
-        <Grid>
-          <Text b size={15}>
-            HomePage :{" "}
-            <Link href={props.data.homepageUrl} target="_blank">
-              Go to Link
-            </Link>
-          </Text>
-          <Spacer y="1" />
-          <Button
-            auto
-            css={{
-              borderRadius: "$xl", // radii.xs
-              border: "$space$1 solid transparent",
-              background: "$blue100", // colors.pink800
-              color: "$blue900",
-              height: "$12", // space[12]
-              boxShadow: "$md", // shadows.md
-              "&:hover": {
-                background: "$blue500",
-                color: "$blue900",
-              },
-              "&:active": {
-                background: "$blue200",
-              },
-              "&:focus": {
-                borderColor: "$blue400",
-              },
-            }}
-            onPress={() => {
-              setScreenshotData(null);
-              setScreenshotModalIsOpen(true);
-              setScreenshotData(`${domain}/homepage.png`);
-            }}
-          >
-            View Screenshot
-          </Button>
-        </Grid>
-        {props.data.categoryUrl != "Not Found" ? (
-          <Grid>
-            <Text b size={15}>
-              Category :{" "}
-              <Link href={props.data.categoryUrl} target="_blank">
-                Go to Link
+        {Object.keys(props.data.socialLinks).map((url) => {
+          return (
+            <Grid key={url}>
+              <Link href={props.data.socialLinks[url]} target="_blank">
+                <img
+                  src={`/social/${url}.svg`}
+                  alt={url}
+                  width={30}
+                  height={"auto"}
+                />
               </Link>
-            </Text>
-            <Spacer y="1" />
-            <Button
-              auto
-              css={{
-                borderRadius: "$xl", // radii.xs
-                border: "$space$1 solid transparent",
-                background: "$blue100", // colors.pink800
-                color: "$blue900",
-                height: "$12", // space[12]
-                boxShadow: "$md", // shadows.md
-                "&:hover": {
-                  background: "$blue500",
-                  color: "$blue900",
-                },
-                "&:active": {
-                  background: "$blue200",
-                },
-                "&:focus": {
-                  borderColor: "$blue400",
-                },
-              }}
-              onPress={() => {
-                setScreenshotData(null);
-                setScreenshotModalIsOpen(true);
-                setScreenshotData(`${domain}/category.png`);
-              }}
-            >
-              View Screenshot
-            </Button>
-          </Grid>) : null}
-        {props.data.categoryUrl != "Not Found" ? (
-          <Grid>
-            <Text b size={15} css={{}}>
-              Article :{" "}
-              <Link href={props.data.articleUrl} target="_blank">
-                Go to Link
-              </Link>
-            </Text>
-            <Spacer y="1" />
-            <Button
-              auto
-              css={{
-                borderRadius: "$xl", // radii.xs
-                border: "$space$1 solid transparent",
-                background: "$blue100", // colors.pink800
-                color: "$blue900",
-                height: "$12", // space[12]
-                boxShadow: "$md", // shadows.md
-                "&:hover": {
-                  background: "$blue500",
-                  color: "$blue900",
-                },
-                "&:active": {
-                  background: "$blue200",
-                },
-                "&:focus": {
-                  borderColor: "$blue400",
-                },
-              }}
-              onPress={() => {
-                setScreenshotData(null);
-                setScreenshotModalIsOpen(true);
-                setScreenshotData(`${domain}/article.png`);
-              }}
-            >
-              View Screenshot
-            </Button>
-          </Grid>) : null}
+            </Grid>
+          );
+        })}
       </Grid.Container>
+      <Spacer y={2} />
+      {console.log(props.similarWebData.Engagments)}
+      <Grid.Container justify="space-evenly">
+        <Grid>
+          <Text h4>Traffic & Engagement Last Month</Text>
+          <Card isHoverable variant="bordered" css={{ mw: "250px", p: "$10" }}>
+            <Text size={15}>
+              Bounce Rate
+              <br />
+              <Text b size={20}>
+                {(props.similarWebData?.Engagments?.BounceRate * 100).toFixed(
+                  2
+                )}{" "}
+                %
+              </Text>
+            </Text>
+            <Spacer y={1} />
+
+            <Text size={15}>
+              Page Per Visit
+              <br />
+              <Text b size={20}>
+                {(props.similarWebData?.Engagments?.PagePerVisit * 1).toFixed(
+                  2
+                )}
+              </Text>
+            </Text>
+
+            <Spacer y={1} />
+            <Text size={15}>
+              Visits
+              <br />
+              <Text b size={20}>
+                {(props.similarWebData?.Engagments?.Visits / 1000000).toFixed(
+                  2
+                )}{" "}
+                M
+              </Text>
+            </Text>
+
+            <Spacer y={1} />
+            <Text size={15}>
+              Last Month Change
+              <br />
+              <Text b size={20}>
+                {(
+                  ((Object.values(props.similarWebData.EstimatedMonthlyVisits)[
+                    Object.values(props.similarWebData.EstimatedMonthlyVisits)
+                      .length - 1
+                  ] -
+                    Object.values(props.similarWebData.EstimatedMonthlyVisits)[
+                    Object.values(props.similarWebData.EstimatedMonthlyVisits)
+                      .length - 2
+                    ]) /
+                    Object.values(props.similarWebData.EstimatedMonthlyVisits)[
+                    Object.values(props.similarWebData.EstimatedMonthlyVisits)
+                      .length - 2
+                    ]) *
+                  100
+                ).toFixed(2)}{" "}
+                %
+              </Text>
+            </Text>
+
+            <Spacer y={1} />
+            <Text size={15}>
+              Avg Visit Duration
+              <br />
+              <Text b size={20}>
+                {secondsToMinutes(
+                  Math.round(props.similarWebData?.Engagments?.TimeOnSite)
+                )}{" "}
+              </Text>
+            </Text>
+          </Card>
+        </Grid>
+        <Grid>
+          <Text h4>Traffic Sources</Text>
+          <Pie data={trafficSourcesData} width={400} height={400} />
+        </Grid>
+      </Grid.Container>
+      <Grid.Container justify="space-evenly">
+        <Grid>
+          <Spacer y={2} />
+          <Text h4>Total Visits Last 3 Months</Text>
+          <div>
+            <Bar
+              data={chartData}
+              width={400}
+              height={450}
+              options={chartOptions}
+            />
+          </div>
+        </Grid>
+        <Grid>
+          <Spacer y={2} />
+          <Text h4>Geography & Country Targeting</Text>
+          {totalCountryShares < 100
+            ? (TopCountrySharesData.labels.push("Others"),
+              TopCountrySharesData.datasets[0].data.push(
+                100 - totalCountryShares
+              ))
+            : null}
+          <Pie data={TopCountrySharesData} width={400} height={400} />
+        </Grid>
+      </Grid.Container>
+      <Spacer y={2} />
+      <Text h3>Page Screenshots</Text>
+      <Grid.Container gap={2} justify="center">
+        {Object.keys(screenshot).map((key) => {
+          return (
+            <Grid>
+              <Text b size={15}>
+                {key.toUpperCase()} :{" "}
+                <Link href={screenshot[key].url} target="_blank">
+                  Go to Link
+                </Link>
+              </Text>
+              <Spacer y="1" />
+              <Text>Desktop</Text>
+              <Button
+                auto
+                css={buttonCss}
+                onPress={() => {
+                  setScreenshotData(null);
+                  setScreenshotModalIsOpen(true);
+                  setScreenshotData(screenshot[key].desktopScreenShot);
+                }}
+              >
+                View Screenshot
+              </Button>
+              <Spacer y="1" />
+              <Text>Mobile</Text>
+              <Button
+                auto
+                css={buttonCss}
+                onPress={() => {
+                  setScreenshotData(null);
+                  setScreenshotModalIsOpen(true);
+                  setScreenshotData(screenshot[key].mobileScreenShot);
+                }}
+              >
+                View Screenshot
+              </Button>
+            </Grid>
+          );
+        })}
+      </Grid.Container>
+
       <Spacer y={1.5} />
-      <div>
-        <Text css={{ alignContent: "flex-start" }}>
-          Privacy Policy :
+      <Text h3>Links</Text>
+      <div align="center">
+        <Text>
+          Privacy Policy :{" "}
           <Link href={props.data.privacyPolicy} target="_blank">
             {props.data.privacyPolicy}
           </Link>
         </Text>
         <Text>
-          Terms and conditions :
+          Terms and conditions :{" "}
           <Link href={props.data.termsAndConditions} target="_blank">
             {props.data.termsAndConditions}
           </Link>
         </Text>
         <Spacer y={1} />
-        {Object.keys(props.data.socialLinks).map((url) => {
-          return (
-            <Text key={url}>
-              {url} :
-              <Link href={props.data.socialLinks[url]} target="_blank">
-                {props.data.socialLinks[url]}
-              </Link>
-            </Text>
-          );
-        })}
       </div>
 
       <Modal
@@ -212,3 +493,32 @@ const myLoader = (src) => {
 };
 
 export default Details;
+
+// Go to website and fetch social urls
+const getSocialUrls = async (url) => {
+  const res = await fetch(`http://` + url);
+  const html = await res.text();
+  const $ = cheerio.load(html);
+  const socialUrls = {};
+  $("a").each((i, el) => {
+    const href = $(el).attr("href");
+    if (href) {
+      if (href.includes("facebook")) {
+        socialUrls.facebook = href;
+      }
+      if (href.includes("twitter")) {
+        socialUrls.twitter = href;
+      }
+      if (href.includes("instagram")) {
+        socialUrls.instagram = href;
+      }
+      if (href.includes("linkedin")) {
+        socialUrls.linkedin = href;
+      }
+      if (href.includes("youtube")) {
+        socialUrls.youtube = href;
+      }
+    }
+  });
+  return socialUrls;
+};

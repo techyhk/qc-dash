@@ -68,60 +68,6 @@ export function NavBar() {
           <Navbar.Link isActive={router.pathname === "/"} href="\">
             Home
           </Navbar.Link>
-          <Dropdown>
-            <Navbar.Item isActive={router.pathname.includes("/dashboard")} hideIn="md">
-              <Dropdown.Button
-                auto
-                iconRight={icons.chevron}
-                ripple
-                light
-                css={{
-                  px: 0,
-                  dflex: "center",
-                  svg: { pe: "none" },
-                }}
-              >
-                Dashboard
-              </Dropdown.Button>
-            </Navbar.Item>
-            <Dropdown.Menu
-              disabledKeys={["Header Bidding"]}
-              aria-label="Products"
-              items={menuItems}
-              selectionMode="single"
-              onSelectionChange={selectedItem => selectMenuItem(selectedItem)}
-              css={{
-                $$dropdownMenuWidth: "340px",
-                $$dropdownItemHeight: "70px",
-                "& .nextui-dropdown-item": {
-                  py: "$4",
-                  // dropdown item left icon
-                  svg: {
-                    color: "$gradient",
-                    mr: "$4",
-                  },
-                  // dropdown item title
-                  "& .nextui-dropdown-item-content": {
-                    w: "100%",
-                    fontWeight: "$semibold",
-                  },
-                },
-              }}
-            >
-              {item => (
-                <Dropdown.Item
-                  key={item.key}
-                  color="primary"
-                  icon={item.icon}
-                  textValue={item.name}
-                  showFullDescription
-                  description={item.description}
-                >
-                  {item.name}
-                </Dropdown.Item>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
         </Navbar.Content>
         {!user ? (
           <Navbar.Content>
