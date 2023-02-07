@@ -26,9 +26,13 @@ const Home = () => {
   };
 
   async function getDataSimilarWeb(site) {
-    const res = await fetch(`https://data.similarweb.com/api/v1/data?domain=${site}`);
-    const data = await res.json();
-    setSimilarWebData(data);
+    try {
+      const res = await fetch(`https://data.similarweb.com/api/v1/data?domain=${site}`);
+      const data = await res.json();
+      setSimilarWebData(data);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -58,31 +62,35 @@ const Home = () => {
               disabled={inputState === "disabled" ? true : false}
               onPress={async () => {
                 console.log("searchData", search);
-                setEnable(false);
-                setError(null);
-                setData({});
-                setLoading(true);
-                setInputState("disabled");
-                await getDataSimilarWeb(search);
-                try {
-                  socialUrls = await axios.post(`/api/pptr`, {
-                    url: search,
-                  });
-                  setData(socialUrls.data);
-                  setEnable(true);
-                } catch (err) {
-                  setError(err.response.data.error);
-                } finally {
-                  setLoading(false);
-                  setInputState("enabled");
+                if (search != "") {
+                  setEnable(false);
+                  setError(null);
+                  setData({});
+                  setLoading(true);
+                  setInputState("disabled");
+                  await getDataSimilarWeb(search);
+                  try {
+                    socialUrls = await axios.post(`/api/pptr`, {
+                      url: search,
+                    });
+                    setData(socialUrls.data);
+                    setEnable(true);
+                  } catch (err) {
+                    setError(err.response.data.error);
+                  } finally {
+                    setLoading(false);
+                    setInputState("enabled");
+                  }
+                } else {
+                  setError("Please enter a valid url");
                 }
               }}
             >
               Search
             </Button>
 
-            {loading ? <Spacer y="5"><Loading type="points-opacity" size="xl" /></Spacer> : null}
-            {error ? <Text>Error :{error}</Text> : null}
+            {loading ? <><Spacer y="5" /><Loading type="points-opacity" size="xl" /></> : null}
+            {error ? <><Spacer y="2" /><Text color="error" b>Error : {error}</Text></> : null}
             {enable ? (
               <Details
                 site={search}
