@@ -1,4 +1,7 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+// Enable stealth plugin with all evasions
+puppeteer.use(require('puppeteer-extra-plugin-stealth')());
+
 const fs = require('fs');
 
 let flag = 0, page;
@@ -7,17 +10,11 @@ export default async function handler(req, res) {
   try {
     console.log("Puppeteer is running", req.body.url);
     const browser = await puppeteer.launch({
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-      args: ["--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--window-position=0,0",
-        "--ignore-certifcate-errors",
-        "--ignore-certifcate-errors-spki-list"],
-      ignoreDefaultArgs: ["--enable-automation"],
+      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      args: ['--no-sandbox'],
       headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     });
-
     page = await browser.newPage();
     const url = (req.body.url).replace(/^https?:\/\//, "").replace("www.", "");
     let domain = url.split(".");
@@ -97,6 +94,9 @@ export default async function handler(req, res) {
     try {
       if (!fs.existsSync(`./data/${domain}`)) {
         fs.mkdirSync(`./data/${domain}`);
+      } else {
+        fs.rmdir(`./data/${domain}`);
+        fs.mkdirSync(`./data/${domain}`);
       }
     } catch (err) {
       console.error(err);
@@ -123,10 +123,16 @@ export default async function handler(req, res) {
       const page2 = await browser.newPage();
       categoryUrl = await random(categoryurls);
       await page2.goto(categoryUrl, { timeout: 60000 });
+      // if (await page2.$("iframe[src*='Advertisement']")) {
       await page2.screenshot({ path: `./data/${domain}/category.png`, fullPage: true });
       await page2.setViewport({ width: 375, height: 667 });
       await page2.reload();
       await page2.screenshot({ path: `./data/${domain}/category_mobile.png`, fullPage: true });
+      // } else {
+      //   console.log("No ads found in category page");
+      //   categoryurls = [];
+      //   console.log(categoryurls);
+      // }
     }
 
     if (articleurls.length > 0) {
@@ -134,10 +140,16 @@ export default async function handler(req, res) {
       const page3 = await browser.newPage();
       articleUrl = await random(articleurls);
       await page3.goto(articleUrl, { timeout: 60000 });
+      // if (await page3.$("iframe[src*='Advertisement']")) {
       await page3.screenshot({ path: `./data/${domain}/article.png`, fullPage: true });
       await page3.setViewport({ width: 375, height: 667 });
       await page3.reload();
       await page3.screenshot({ path: `./data/${domain}/article_mobile.png`, fullPage: true });
+      // } else {
+      //   console.log("No ads found in category page");
+      //   articleurls = [];
+      //   console.log(articleurls);
+      // }
     }
     await browser.close();
     console.log("Done");
@@ -153,8 +165,8 @@ export default async function handler(req, res) {
       });
   } catch (error) {
     console.log(error);
-    await page.screenshot({ path: `./data/error.png`, fullPage: true });
     res.status(404).json({ error: error.message });
+    await page.screenshot({ path: `./data/error.png`, fullPage: true });
   }
 }
 
@@ -319,7 +331,7 @@ async function random(arr) {
 // advertisment to content ratio of a website (advertisment to content ratio of a website)
 async function adToContentRatio(page) {
   const adToContentRatio = await page.evaluate(() => {
-    const ads = document.querySelectorAll("iframe[title='Advertisement'], script");
+    const ads = document.querySelectorAll("iframe[title='Advertisement']");
     const content = document.querySelectorAll("p, h1, h2, h3, h4, h5, h6, a");
     return (ads.length / content.length) * 100;
   });
