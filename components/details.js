@@ -261,7 +261,7 @@ const Details = (props) => {
         weight="bold"
       >
         {" "}
-        Website :{props.site}
+        Website : {props.similarWebData.SiteName}
       </Text>
       <Spacer y={1} />
       <Grid.Container gap={2} justify="center">
