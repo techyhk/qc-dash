@@ -25,16 +25,6 @@ const Home = () => {
     setError(null);
   };
 
-  async function getDataSimilarWeb(site) {
-    try {
-      const res = await fetch(`https://data.similarweb.com/api/v1/data?domain=${site}`);
-      const data = await res.json();
-      setSimilarWebData(data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   return (
     <SSRProvider>
       {user && (
@@ -68,7 +58,6 @@ const Home = () => {
                   setData({});
                   setLoading(true);
                   setInputState("disabled");
-                  await getDataSimilarWeb(search);
                   try {
                     socialUrls = await axios.post(`/api/pptr`, {
                       url: search,
@@ -95,7 +84,6 @@ const Home = () => {
               <Details
                 site={search}
                 data={data}
-                similarWebData={similarWebData}
               />
             ) : null}
           </div>

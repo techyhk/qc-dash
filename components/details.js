@@ -225,32 +225,32 @@ const Details = (props) => {
 
   return (
     <>
-      {Object.keys(props.similarWebData.EstimatedMonthlyVisits).forEach(
+      {Object.keys(props.data.similarWebData.EstimatedMonthlyVisits).forEach(
         (key) => {
           chartData.labels.push(ConvertDate(key));
           chartData.datasets[0].data.push(
-            props.similarWebData.EstimatedMonthlyVisits[key]
+            props.data.similarWebData.EstimatedMonthlyVisits[key]
           );
         }
       )}
-      {Object.keys(props.similarWebData.TrafficSources).forEach((key) => {
+      {Object.keys(props.data.similarWebData.TrafficSources).forEach((key) => {
         trafficSourcesData.labels.push(key);
         trafficSourcesData.datasets[0].data.push(
-          props.similarWebData.TrafficSources[key] * 100
+          props.data.similarWebData.TrafficSources[key] * 100
         );
       })}
-      {Object.keys(props.similarWebData.TopCountryShares).forEach((key) => {
+      {Object.keys(props.data.similarWebData.TopCountryShares).forEach((key) => {
         TopCountrySharesData.labels.push(
           similarWebCountryData[
-          props.similarWebData.TopCountryShares[key].Country
+          props.data.similarWebData.TopCountryShares[key].Country
           ]
         );
         TopCountrySharesData.datasets[0].data.push(
-          props.similarWebData.TopCountryShares[key].Value * 100
+          props.data.similarWebData.TopCountryShares[key].Value * 100
         );
         totalCountryShares =
           totalCountryShares +
-          props.similarWebData.TopCountryShares[key].Value * 100;
+          props.data.similarWebData.TopCountryShares[key].Value * 100;
       })}
       <Spacer y={2} />
       <Text
@@ -261,7 +261,7 @@ const Details = (props) => {
         weight="bold"
       >
         {" "}
-        Website : {props.similarWebData.SiteName}
+        Website : {props.data.similarWebData.SiteName}
       </Text>
       <Spacer y={1} />
       <Grid.Container gap={2} justify="center">
@@ -281,7 +281,7 @@ const Details = (props) => {
         })}
       </Grid.Container>
       <Spacer y={2} />
-      {console.log(props.similarWebData.Engagments)}
+      {console.log(props.data.similarWebData.Engagments)}
       <Grid.Container justify="space-evenly">
         <Grid>
           <Text h4>Traffic & Engagement Last Month</Text>
@@ -290,7 +290,7 @@ const Details = (props) => {
               Bounce Rate
               <br />
               <Text b size={20}>
-                {(props.similarWebData?.Engagments?.BounceRate * 100).toFixed(
+                {(props.data.similarWebData?.Engagments?.BounceRate * 100).toFixed(
                   2
                 )}{" "}
                 %
@@ -302,7 +302,7 @@ const Details = (props) => {
               Page Per Visit
               <br />
               <Text b size={20}>
-                {(props.similarWebData?.Engagments?.PagePerVisit * 1).toFixed(
+                {(props.data.similarWebData?.Engagments?.PagePerVisit * 1).toFixed(
                   2
                 )}
               </Text>
@@ -313,7 +313,7 @@ const Details = (props) => {
               Visits
               <br />
               <Text b size={20}>
-                {(props.similarWebData?.Engagments?.Visits / 1000000).toFixed(
+                {(props.data.similarWebData?.Engagments?.Visits / 1000000).toFixed(
                   2
                 )}{" "}
                 M
@@ -326,16 +326,16 @@ const Details = (props) => {
               <br />
               <Text b size={20}>
                 {(
-                  ((Object.values(props.similarWebData.EstimatedMonthlyVisits)[
-                    Object.values(props.similarWebData.EstimatedMonthlyVisits)
+                  ((Object.values(props.data.similarWebData.EstimatedMonthlyVisits)[
+                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)
                       .length - 1
                   ] -
-                    Object.values(props.similarWebData.EstimatedMonthlyVisits)[
-                    Object.values(props.similarWebData.EstimatedMonthlyVisits)
+                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)[
+                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)
                       .length - 2
                     ]) /
-                    Object.values(props.similarWebData.EstimatedMonthlyVisits)[
-                    Object.values(props.similarWebData.EstimatedMonthlyVisits)
+                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)[
+                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)
                       .length - 2
                     ]) *
                   100
@@ -350,7 +350,7 @@ const Details = (props) => {
               <br />
               <Text b size={20}>
                 {secondsToMinutes(
-                  Math.round(props.similarWebData?.Engagments?.TimeOnSite)
+                  Math.round(props.data.similarWebData?.Engagments?.TimeOnSite)
                 )}{" "}
               </Text>
             </Text>

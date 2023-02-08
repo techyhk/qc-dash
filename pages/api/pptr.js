@@ -1,10 +1,10 @@
 const puppeteer = require('puppeteer-extra');
 // Enable stealth plugin with all evasions
 puppeteer.use(require('puppeteer-extra-plugin-stealth')());
-
+import axios from "axios";
 const fs = require('fs');
 
-let flag = 0, page;
+let flag = 0, page, similarWebData;
 
 export default async function handler(req, res) {
   try {
@@ -16,6 +16,14 @@ export default async function handler(req, res) {
       defaultViewport: { width: 1920, height: 1080 },
     });
     page = await browser.newPage();
+    const site = "https://data.similarweb.com/api/v1/data";
+
+    const apiSimilarWebRes = await axios.get(site, {
+      params: { domain: "github.com" },
+      headers: { Accept: 'application/json', 'User-Agent': 'PostmanRuntime/7.30.0', Host: '' }
+    });
+    similarWebData = apiSimilarWebRes.data;
+
     const url = (req.body.url).replace(/^https?:\/\//, "").replace("www.", "");
     let domain = url.split(".");
     domain = domain[domain.length - 2];
@@ -94,9 +102,6 @@ export default async function handler(req, res) {
     try {
       if (!fs.existsSync(`./data/${domain}`)) {
         fs.mkdirSync(`./data/${domain}`);
-      } else {
-        fs.rmdir(`./data/${domain}`);
-        fs.mkdirSync(`./data/${domain}`);
       }
     } catch (err) {
       console.error(err);
@@ -162,6 +167,7 @@ export default async function handler(req, res) {
         homepageUrl: `https://${url}`,
         categoryUrl: categoryurls.length > 0 ? categoryUrl : "Not Found",
         articleUrl: articleurls.length > 0 ? articleUrl : "Not Found",
+        similarWebData: similarWebData,
       });
   } catch (error) {
     console.log(error);
