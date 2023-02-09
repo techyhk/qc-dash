@@ -38,11 +38,11 @@ export function NavBar() {
             <Navbar.Link color="inherit" href="/login">
               Login
             </Navbar.Link>
-            <Navbar.Item>
+            {/* <Navbar.Item>
               <Button auto ghost as={Link} color="gradient" href="/signup">
                 Sign Up
               </Button>
-            </Navbar.Item>
+            </Navbar.Item> */}
           </Navbar.Content>
         ) : (
           <Navbar.Content>

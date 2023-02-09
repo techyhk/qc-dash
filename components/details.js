@@ -148,6 +148,7 @@ const similarWebCountryData = {
   634: "Qatar",
   414: "Kuwait",
   616: "Poland",
+  40: "Austria",
 };
 
 const Details = (props) => {
@@ -280,6 +281,29 @@ const Details = (props) => {
           );
         })}
       </Grid.Container>
+      <Spacer y={1.5} />
+      <Text h3>Links</Text>
+      <div align="center">
+        <Text>
+          Privacy Policy :{" "}
+          {props.data.privacyPolicy.includes("No") ?
+            (<Text color="error">{props.data.privacyPolicy}</Text>) :
+            <Link href={props.data.privacyPolicy} target="_blank">
+              {props.data.privacyPolicy}
+            </Link>
+          }
+        </Text>
+        <Text>
+          Terms and conditions :{" "}
+          {props.data.termsAndConditions.includes("No") ?
+            (<Text color="error">{props.data.termsAndConditions}</Text>) :
+            <Link href={props.data.termsAndConditions} target="_blank">
+              {props.data.termsAndConditions}
+            </Link>
+          }
+        </Text>
+        <Spacer y={1} />
+      </div>
       <Spacer y={2} />
       {console.log(props.data.similarWebData.Engagments)}
       <Grid.Container justify="space-evenly">
@@ -391,61 +415,46 @@ const Details = (props) => {
       <Grid.Container gap={2} justify="center">
         {Object.keys(screenshot).map((key) => {
           return (
-            <Grid>
-              <Text b size={15}>
-                {key.toUpperCase()} :{" "}
-                <Link href={screenshot[key].url} target="_blank">
-                  Go to Link
-                </Link>
-              </Text>
-              <Spacer y="1" />
-              <Text>Desktop</Text>
-              <Button
-                auto
-                css={buttonCss}
-                onPress={() => {
-                  setScreenshotData(null);
-                  setScreenshotModalIsOpen(true);
-                  setScreenshotData(screenshot[key].desktopScreenShot);
-                }}
-              >
-                View Screenshot
-              </Button>
-              <Spacer y="1" />
-              <Text>Mobile</Text>
-              <Button
-                auto
-                css={buttonCss}
-                onPress={() => {
-                  setScreenshotData(null);
-                  setScreenshotModalIsOpen(true);
-                  setScreenshotData(screenshot[key].mobileScreenShot);
-                }}
-              >
-                View Screenshot
-              </Button>
-            </Grid>
+            <>
+              {screenshot[key].url != "Not Found" ?
+                <Grid key={key}>
+                  <Text b size={15}>
+                    {key.toUpperCase()} :{" "}
+                    <Link href={screenshot[key].url} target="_blank">
+                      Go to Link
+                    </Link>
+                  </Text>
+                  <Spacer y="1" />
+                  <Text>Desktop</Text>
+                  <Button
+                    auto
+                    css={buttonCss}
+                    onPress={() => {
+                      setScreenshotData(null);
+                      setScreenshotModalIsOpen(true);
+                      setScreenshotData(screenshot[key].desktopScreenShot);
+                    }}
+                  >
+                    View Screenshot
+                  </Button>
+                  <Spacer y="1" />
+                  <Text>Mobile</Text>
+                  <Button
+                    auto
+                    css={buttonCss}
+                    onPress={() => {
+                      setScreenshotData(null);
+                      setScreenshotModalIsOpen(true);
+                      setScreenshotData(screenshot[key].mobileScreenShot);
+                    }}
+                  >
+                    View Screenshot
+                  </Button>
+                </Grid> : null}
+            </>
           );
         })}
       </Grid.Container>
-
-      <Spacer y={1.5} />
-      <Text h3>Links</Text>
-      <div align="center">
-        <Text>
-          Privacy Policy :{" "}
-          <Link href={props.data.privacyPolicy} target="_blank">
-            {props.data.privacyPolicy}
-          </Link>
-        </Text>
-        <Text>
-          Terms and conditions :{" "}
-          <Link href={props.data.termsAndConditions} target="_blank">
-            {props.data.termsAndConditions}
-          </Link>
-        </Text>
-        <Spacer y={1} />
-      </div>
 
       <Modal
         autoMargin
@@ -488,8 +497,8 @@ const Details = (props) => {
 };
 
 const myLoader = (src) => {
-  console.log(src);
-  return `http://127.0.0.1:8000/${src}`;
+  console.log(process.env.CHROME_PATH);
+  return `http://170.187.232.198:8000/${src}`;
 };
 
 export default Details;

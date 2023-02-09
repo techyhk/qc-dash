@@ -15,9 +15,10 @@ const Login = () => {
     if (errorMsg) setErrorMsg("");
 
     const body = {
-      email: e.currentTarget.email.value,
+      username: e.currentTarget.username.value,
       password: e.currentTarget.password.value,
     };
+    console.log(body);
 
     try {
       const res = await fetch("/api/login", {

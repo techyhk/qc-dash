@@ -1,12 +1,4 @@
-import {
-  Modal,
-  Input,
-  Row,
-  Button,
-  Text,
-  Link,
-  useTheme,
-} from "@nextui-org/react";
+import { Modal, Input, Row, Button, Text, Link, useTheme } from "@nextui-org/react";
 import { Mail } from "../icons/Mail";
 import { Password } from "../icons/Password";
 import { Person } from "../icons/Person";
@@ -23,13 +15,7 @@ const Form = ({ isLogin, errorMessage, onSubmit }) => {
   };
 
   return (
-    <Modal
-      preventClose
-      blur
-      aria-labelledby="modal-title"
-      open={visible}
-      onClose={closeHandler}
-    >
+    <Modal preventClose blur aria-labelledby="modal-title" open={visible} onClose={closeHandler}>
       <Modal.Header>
         <Text id="modal-title" size={18} b>
           Welcome
@@ -53,14 +39,14 @@ const Form = ({ isLogin, errorMessage, onSubmit }) => {
           )}
 
           <Input
-            aria-label="Username"
+            aria-label="email"
             required
             clearable
             bordered
             fullWidth
             size="lg"
-            placeholder="Username"
-            name="email"
+            placeholder="Email"
+            name="username"
             contentLeft={<Mail fill="currentColor" />}
           />
 
@@ -115,19 +101,11 @@ const Form = ({ isLogin, errorMessage, onSubmit }) => {
           {isLogin ? (
             <>
               <Row justify="space-between">
-                <Text block as={Link} href="/signup" color={color} size={14}>
+                {/* <Text block as={Link} href="/signup" color={color} size={14}>
                   don't have account ?
-                </Text>
+                </Text> */}
               </Row>
-              <Button
-                ghost
-                auto
-                flat
-                color="error"
-                as={Link}
-                href="\"
-                onPress={closeHandler}
-              >
+              <Button ghost auto flat color="error" as={Link} href="\" onPress={closeHandler}>
                 Close
               </Button>
               <Button ghost auto type="submit" color={color}>
@@ -141,15 +119,7 @@ const Form = ({ isLogin, errorMessage, onSubmit }) => {
                   Already have an account ?
                 </Text>
               </Row>
-              <Button
-                ghost
-                auto
-                flat
-                color="error"
-                as={Link}
-                href="/"
-                onPress={closeHandler}
-              >
+              <Button ghost auto flat color="error" as={Link} href="/" onPress={closeHandler}>
                 Close
               </Button>
               <Button ghost auto type="submit" color={color}>

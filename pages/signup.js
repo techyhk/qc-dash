@@ -12,12 +12,10 @@ const Signup = () => {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (errorMsg) {
-      setErrorMsg("");
-    }
+    if (errorMsg) setErrorMsg("");
 
     const body = {
-      email: e.currentTarget.email.value,
+      username: e.currentTarget.username.value,
       password: e.currentTarget.password.value,
       name: e.currentTarget.name.value,
       discord: e.currentTarget.discord.value,
@@ -40,6 +38,7 @@ const Signup = () => {
         throw new Error(await res.text());
       }
     } catch (error) {
+      console.error("An unexpected error happened occurred:", error);
       setErrorMsg(error.message);
     }
   }

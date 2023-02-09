@@ -10,27 +10,54 @@ export default async function handler(req, res) {
   try {
     console.log("Puppeteer is running", req.body.url);
     const browser = await puppeteer.launch({
-      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      args: ['--no-sandbox'],
+      executablePath: process.env.CHROME_PATH,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu',
+        '--disable-extensions',
+        '--disable-default-apps',
+        '--disable-background-networking',
+        '--disable-sync',
+        '--disable-translate',
+      ],
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36',
       headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     });
     page = await browser.newPage();
-    const site = "https://data.similarweb.com/api/v1/data";
+    // const site = "https://data.similarweb.com/api/v1/data";
 
-    const apiSimilarWebRes = await axios.get(site, {
-      params: { domain: "github.com" },
-      headers: { Accept: 'application/json', 'User-Agent': 'PostmanRuntime/7.30.0', Host: '' }
-    });
-    similarWebData = apiSimilarWebRes.data;
+    // const apiSimilarWebRes = await axios.get(site, {
+    //   params: { domain: "github.com" },
+    //   headers: { Accept: 'application/json', 'User-Agent': 'PostmanRuntime/7.30.0', Host: '' }
+    // });
+    // similarWebData = apiSimilarWebRes.data;
+
+    await page.goto(`https://data.similarweb.com/api/v1/data?domain=${req.body.url}`);
+    await new Promise(r => setTimeout(r, 1000));
+    similarWebData = JSON.parse(await page.evaluate(() => {
+      return document.querySelector('pre').textContent;
+    }));
+    await new Promise(r => setTimeout(r, 1000));
 
     const url = (req.body.url).replace(/^https?:\/\//, "").replace("www.", "");
     let domain = url.split(".");
     domain = domain[domain.length - 2];
 
     // Fetch privacy policy , terms and conditions and social links from any website
-    await page.goto(`https://${url}`, { timeout: 60000 });
+    try {
+      await page.goto(`https://${url}`, { timeout: 90000 });
+    } catch (err) {
+      throw new Error("Unable to open url");
+    }
     await page.waitForSelector('body');
+    await new Promise(r => setTimeout(r, 2000));
     await mouseJiggler(page);
     await new Promise(r => setTimeout(r, 20000));
 
@@ -111,6 +138,7 @@ export default async function handler(req, res) {
     console.log("Google Ads", await googleAds(page));
     await page.screenshot({ path: `./data/${domain}/homepage.png`, fullPage: true });
     await page.setViewport({ width: 375, height: 667 });
+    await new Promise(r => setTimeout(r, 2000));
     await page.reload();
     await page.screenshot({ path: `./data/${domain}/homepage_mobile.png`, fullPage: true });
 
@@ -127,11 +155,12 @@ export default async function handler(req, res) {
       console.log("Opening url Category");
       const page2 = await browser.newPage();
       categoryUrl = await random(categoryurls);
-      await page2.goto(categoryUrl, { timeout: 60000 });
+      await page2.goto(categoryUrl, { timeout: 90000 });
       // if (await page2.$("iframe[src*='Advertisement']")) {
       await page2.screenshot({ path: `./data/${domain}/category.png`, fullPage: true });
       await page2.setViewport({ width: 375, height: 667 });
-      await page2.reload();
+      await page2.reload({ timeout: 90000 });
+      await new Promise(r => setTimeout(r, 2000));
       await page2.screenshot({ path: `./data/${domain}/category_mobile.png`, fullPage: true });
       // } else {
       //   console.log("No ads found in category page");
@@ -144,11 +173,12 @@ export default async function handler(req, res) {
       console.log("Opening url Article");
       const page3 = await browser.newPage();
       articleUrl = await random(articleurls);
-      await page3.goto(articleUrl, { timeout: 60000 });
+      await page3.goto(articleUrl, { timeout: 90000 });
       // if (await page3.$("iframe[src*='Advertisement']")) {
       await page3.screenshot({ path: `./data/${domain}/article.png`, fullPage: true });
       await page3.setViewport({ width: 375, height: 667 });
-      await page3.reload();
+      await page3.reload({ timeout: 90000 });
+      await new Promise(r => setTimeout(r, 2000));
       await page3.screenshot({ path: `./data/${domain}/article_mobile.png`, fullPage: true });
       // } else {
       //   console.log("No ads found in category page");
