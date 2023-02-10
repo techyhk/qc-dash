@@ -281,35 +281,36 @@ const Details = (props) => {
           );
         })}
       </Grid.Container>
-      <Spacer y={1.5} />
-      <Text h3>Links</Text>
-      <div align="center">
-        <Text>
-          Privacy Policy :{" "}
-          {props.data.privacyPolicy.includes("No") ?
-            (<Text color="error">{props.data.privacyPolicy}</Text>) :
-            <Link href={props.data.privacyPolicy} target="_blank">
-              {props.data.privacyPolicy}
-            </Link>
-          }
-        </Text>
-        <Text>
-          Terms and conditions :{" "}
-          {props.data.termsAndConditions.includes("No") ?
-            (<Text color="error">{props.data.termsAndConditions}</Text>) :
-            <Link href={props.data.termsAndConditions} target="_blank">
-              {props.data.termsAndConditions}
-            </Link>
-          }
-        </Text>
-        <Spacer y={1} />
-      </div>
-      <Spacer y={2} />
-      {console.log(props.data.similarWebData.Engagments)}
-      <Grid.Container justify="space-evenly">
+      <Grid.Container gap={2} justify="center">
         <Grid>
-          <Text h4>Traffic & Engagement Last Month</Text>
-          <Card isHoverable variant="bordered" css={{ mw: "250px", p: "$10" }}>
+          <Text>
+            Privacy Policy :{" "}
+            {props.data.privacyPolicy.includes("No") ?
+              (<Text color="error">{props.data.privacyPolicy}</Text>) :
+              <Link href={props.data.privacyPolicy} target="_blank">
+                {props.data.privacyPolicy}
+              </Link>
+            }
+          </Text>
+        </Grid>
+        <Grid>
+          <Text>
+            Terms and conditions :{" "}
+            {props.data.termsAndConditions.includes("No") ?
+              (<Text color="error">{props.data.termsAndConditions}</Text>) :
+              <Link href={props.data.termsAndConditions} target="_blank">
+                {props.data.termsAndConditions}
+              </Link>
+            }
+          </Text>
+        </Grid>
+        <Spacer y={1} />
+      </Grid.Container>
+      <Spacer y={2} />
+      <Card isHoverable css={{ mw: "1200px", p: "$10" }}>
+        <Text h4>Traffic & Engagement Last Month</Text>
+        <Grid.Container gap={5} justify="center">
+          <Grid>
             <Text size={15}>
               Bounce Rate
               <br />
@@ -320,8 +321,8 @@ const Details = (props) => {
                 %
               </Text>
             </Text>
-            <Spacer y={1} />
-
+          </Grid>
+          <Grid>
             <Text size={15}>
               Page Per Visit
               <br />
@@ -331,8 +332,8 @@ const Details = (props) => {
                 )}
               </Text>
             </Text>
-
-            <Spacer y={1} />
+          </Grid>
+          <Grid>
             <Text size={15}>
               Visits
               <br />
@@ -343,8 +344,8 @@ const Details = (props) => {
                 M
               </Text>
             </Text>
-
-            <Spacer y={1} />
+          </Grid>
+          <Grid>
             <Text size={15}>
               Last Month Change
               <br />
@@ -367,8 +368,8 @@ const Details = (props) => {
                 %
               </Text>
             </Text>
-
-            <Spacer y={1} />
+          </Grid>
+          <Grid>
             <Text size={15}>
               Avg Visit Duration
               <br />
@@ -378,38 +379,40 @@ const Details = (props) => {
                 )}{" "}
               </Text>
             </Text>
-          </Card>
-        </Grid>
-        <Grid>
-          <Text h4>Traffic Sources</Text>
-          <Pie data={trafficSourcesData} width={400} height={400} />
-        </Grid>
-      </Grid.Container>
-      <Grid.Container justify="space-evenly">
-        <Grid>
-          <Spacer y={2} />
-          <Text h4>Total Visits Last 3 Months</Text>
-          <div>
-            <Bar
-              data={chartData}
-              width={400}
-              height={450}
-              options={chartOptions}
-            />
-          </div>
-        </Grid>
-        <Grid>
-          <Spacer y={2} />
-          <Text h4>Geography & Country Targeting</Text>
-          {totalCountryShares < 100
-            ? (TopCountrySharesData.labels.push("Others"),
-              TopCountrySharesData.datasets[0].data.push(
-                100 - totalCountryShares
-              ))
-            : null}
-          <Pie data={TopCountrySharesData} width={400} height={400} />
-        </Grid>
-      </Grid.Container>
+          </Grid>
+        </Grid.Container>
+
+        <Grid.Container gap={1} justify="space-evenly">
+          <Grid>
+            <Spacer y={2} />
+            <Text h4>Traffic Sources</Text>
+            <Pie data={trafficSourcesData} width={300} height={300} />
+          </Grid>
+          <Grid>
+            <Spacer y={2} />
+            <Text h4>Total Visits Last 3 Months</Text>
+            <div>
+              <Bar
+                data={chartData}
+                width={300}
+                height={300}
+                options={chartOptions}
+              />
+            </div>
+          </Grid>
+          <Grid>
+            <Spacer y={2} />
+            <Text h4>Geography & Country Targeting</Text>
+            {totalCountryShares < 100
+              ? (TopCountrySharesData.labels.push("Others"),
+                TopCountrySharesData.datasets[0].data.push(
+                  100 - totalCountryShares
+                ))
+              : null}
+            <Pie data={TopCountrySharesData} width={300} height={300} />
+          </Grid>
+        </Grid.Container>
+      </Card>
       <Spacer y={2} />
       <Text h3>Page Screenshots</Text>
       <Grid.Container gap={2} justify="center">
