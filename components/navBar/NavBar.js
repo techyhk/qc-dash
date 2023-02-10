@@ -1,10 +1,11 @@
 import React from "react";
-import { Navbar, Button, Link, Text, useTheme, Avatar, Dropdown } from "@nextui-org/react";
+import { Navbar, Button, Link, Text, useTheme, Avatar, Dropdown, Image } from "@nextui-org/react";
 import { useUser } from "../../lib/hooks";
 import { ThemeSwitch } from "./ThemeSwitch";
 import { useRouter } from "next/router";
 
 export function NavBar() {
+  const { isDark } = useTheme();
   const user = useUser();
   const router = useRouter();
 
@@ -14,9 +15,11 @@ export function NavBar() {
         <Navbar.Toggle showIn="md" />
         <Navbar.Brand>
           <Link href="/">
-            <Text h2 b color="inherit" hideIn="md">
-              Unibots
-            </Text>
+            {isDark ? (
+              <Image src="/unibots_light_logo.svg" width="200px" height="200px" />
+            ) : (
+              <Image src="/unibots_dark_logo.svg" width="200px" height="200px" />
+            )}
           </Link>
         </Navbar.Brand>
         <Navbar.Content
