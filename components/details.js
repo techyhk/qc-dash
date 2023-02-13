@@ -149,6 +149,36 @@ const similarWebCountryData = {
   414: "Kuwait",
   616: "Poland",
   40: "Austria",
+  203: "Czech Republic",
+  208: "Denmark",
+  233: "Estonia",
+  246: "Finland",
+  250: "France",
+  276: "Germany",
+  300: "Greece",
+  348: "Hungary",
+  352: "Iceland",
+  372: "Ireland",
+  380: "Italy",
+  428: "Latvia",
+  440: "Lithuania",
+  442: "Luxembourg",
+  528: "Netherlands",
+  578: "Norway",
+  616: "Poland",
+  620: "Portugal",
+  642: "Romania",
+  703: "Slovakia",
+  705: "Slovenia",
+  724: "Spain",
+  752: "Sweden",
+  756: "Switzerland",
+  710: "South Africa",
+  404: "Kenya",
+  894: "Zambia",
+  818: "Egypt",
+  566: "Nigeria",
+  144: "Sri Lanka",
 };
 
 const Details = (props) => {
@@ -418,7 +448,7 @@ const Details = (props) => {
       <Grid.Container gap={2} justify="center">
         {Object.keys(screenshot).map((key) => {
           return (
-            <>
+            <div key={key}>
               {screenshot[key].url != "Not Found" ?
                 <Grid key={key}>
                   <Text b size={15}>
@@ -454,7 +484,7 @@ const Details = (props) => {
                     View Screenshot
                   </Button>
                 </Grid> : null}
-            </>
+            </div>
           );
         })}
       </Grid.Container>
