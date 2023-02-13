@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     console.log("Fetching similar web data for ", url);
     await page.goto(`https://data.similarweb.com/api/v1/data?domain=${url}`, {
       waitUntil: "load",
-      timeout: 0,
+      timeout: 15000,
     });
     similarWebData = JSON.parse(
       await page.evaluate(() => {
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     );
 
     // Go To Site
-    await page.goto(`https://${url}`, { waitUntil: "load", timeout: 0 });
+    await page.goto(`https://${url}`, { waitUntil: "load", timeout: 30000 });
     await page.waitForSelector("body");
     await mouseJiggler(page);
     await new Promise((r) => setTimeout(r, 5000));
@@ -136,7 +136,7 @@ export default async function handler(req, res) {
     });
     await page.setViewport({ width: 375, height: 667 });
     await new Promise((r) => setTimeout(r, 2000));
-    await page.reload({ waitUntil: "load", timeout: 0 });
+    await page.reload({ waitUntil: "load", timeout: 15000 });
     await page.screenshot({
       path: `./data/${domain}/homepage_mobile.png`,
       fullPage: true,
@@ -165,13 +165,13 @@ export default async function handler(req, res) {
       console.log("Opening url Category");
       const page2 = await browser.newPage();
       categoryUrl = await random(categoryurls);
-      await page2.goto(categoryUrl, { waitUntil: "load", timeout: 0 });
+      await page2.goto(categoryUrl, { waitUntil: "load", timeout: 15000 });
       await page2.screenshot({
         path: `./data/${domain}/category.png`,
         fullPage: true,
       });
       await page2.setViewport({ width: 375, height: 667 });
-      await page2.reload({ waitUntil: "load", timeout: 0 });
+      await page2.reload({ waitUntil: "load", timeout: 15000 });
       await new Promise((r) => setTimeout(r, 2000));
       await page2.screenshot({
         path: `./data/${domain}/category_mobile.png`,
@@ -183,13 +183,13 @@ export default async function handler(req, res) {
       console.log("Opening url Article");
       const page3 = await browser.newPage();
       articleUrl = await random(articleurls);
-      await page3.goto(articleUrl, { waitUntil: "load", timeout: 0 });
+      await page3.goto(articleUrl, { waitUntil: "load", timeout: 15000 });
       await page3.screenshot({
         path: `./data/${domain}/article.png`,
         fullPage: true,
       });
       await page3.setViewport({ width: 375, height: 667 });
-      await page3.reload({ waitUntil: "load", timeout: 0 });
+      await page3.reload({ waitUntil: "load", timeout: 15000 });
       await new Promise((r) => setTimeout(r, 2000));
       await page3.screenshot({
         path: `./data/${domain}/article_mobile.png`,
