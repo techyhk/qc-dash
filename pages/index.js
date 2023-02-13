@@ -70,7 +70,7 @@ const Home = () => {
                         };
 
                         let reqOptions = {
-                          url: `/api/crawler/${search}`,
+                          url: `/api/crawler/${search.replace(/(^\w+:|^)\/\//, "")}`,
                           method: "GET",
                           headers: headersList,
                         };
