@@ -1,64 +1,58 @@
-const puppeteer = require('puppeteer-extra');
+const puppeteer = require("puppeteer-extra");
 // Enable stealth plugin with all evasions
-puppeteer.use(require('puppeteer-extra-plugin-stealth')());
-import axios from "axios";
-const fs = require('fs');
+puppeteer.use(require("puppeteer-extra-plugin-stealth")());
+const fs = require("fs");
 
-let flag = 0
+let flag = 0;
 
 export default async function handler(req, res) {
+  const { siteCrawler } = req.query;
   let page, similarWebData;
   try {
-    console.log("Puppeteer is running", req.body.url);
+    console.log("Puppeteer is running", siteCrawler);
     const browser = await puppeteer.launch({
       executablePath: process.env.CHROME_PATH,
       args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu',
-        '--disable-extensions',
-        '--disable-default-apps',
-        '--disable-background-networking',
-        '--disable-sync',
-        '--disable-translate',
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--no-first-run",
+        "--no-zygote",
+        "--single-process",
+        "--disable-gpu",
+        "--disable-extensions",
+        "--disable-default-apps",
+        "--disable-background-networking",
+        "--disable-sync",
+        "--disable-translate",
       ],
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KJHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36',
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
       headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     });
     page = await browser.newPage();
-    // const site = "https://data.similarweb.com/api/v1/data";
-
-    // const apiSimilarWebRes = await axios.get(site, {
-    //   params: { domain: "github.com" },
-    //   headers: { Accept: 'application/json', 'User-Agent': 'PostmanRuntime/7.30.0', Host: '' }
-    // });
-    // similarWebData = apiSimilarWebRes.data;
-
-    await page.goto(`https://data.similarweb.com/api/v1/data?domain=${req.body.url}`);
-    similarWebData = JSON.parse(await page.evaluate(() => {
-      return document.querySelector('pre').textContent;
-    }));
-
-    const url = (req.body.url).replace(/^https?:\/\//, "").replace("www.", "");
+    const url = siteCrawler.replace(/^https?:\/\//, "").replace("www.", "");
     let domain = url.split(".");
     domain = domain[domain.length - 2];
 
-    // Fetch privacy policy , terms and conditions and social links from any website
-    try {
-      await page.goto(`https://${url}`, { timeout: 90000, waitUntil: "domcontentloaded" });
-    } catch (err) {
-      throw new Error("Unable to open url");
-    }
-    await page.waitForSelector('body');
-    await new Promise(r => setTimeout(r, 2000));
+    console.log("Fetching similar web data for ", url);
+    await page.goto(`https://data.similarweb.com/api/v1/data?domain=${url}`, {
+      waitUntil: "load",
+      timeout: 0,
+    });
+    similarWebData = JSON.parse(
+      await page.evaluate(() => {
+        return document.querySelector("pre").textContent;
+      })
+    );
+
+    // Go To Site
+    await page.goto(`https://${url}`, { waitUntil: "load", timeout: 0 });
+    await page.waitForSelector("body");
     await mouseJiggler(page);
-    // await new Promise(r => setTimeout(r, 20000));
+    await new Promise((r) => setTimeout(r, 5000));
 
     // Fetch privacy policy
     const privacyPolicy = await page.evaluate(() => {
@@ -69,12 +63,13 @@ export default async function handler(req, res) {
     // Fetch terms and conditions
     const termsAndConditions = await page.evaluate(() => {
       const termsAndConditions = document.querySelector('a[href*="terms"]');
-      return termsAndConditions ? termsAndConditions.href : "No terms and conditions found";
+      return termsAndConditions
+        ? termsAndConditions.href
+        : "No terms and conditions found";
     });
 
     // Fetch social links
     const socialLinks = await page.evaluate(() => {
-
       const socialLinks = {};
 
       const facebook = document.querySelector('a[href*="facebook.com"]');
@@ -135,17 +130,34 @@ export default async function handler(req, res) {
 
     console.log("content Ratio", await adToContentRatio(page));
     console.log("Google Ads", await googleAds(page));
-    await page.screenshot({ path: `./data/${domain}/homepage.png`, fullPage: true });
+    await page.screenshot({
+      path: `./data/${domain}/homepage.png`,
+      fullPage: true,
+    });
     await page.setViewport({ width: 375, height: 667 });
-    await page.reload();
-    await page.screenshot({ path: `./data/${domain}/homepage_mobile.png`, fullPage: true });
+    await new Promise((r) => setTimeout(r, 2000));
+    await page.reload({ waitUntil: "load", timeout: 0 });
+    await page.screenshot({
+      path: `./data/${domain}/homepage_mobile.png`,
+      fullPage: true,
+    });
 
     console.log("Fetching urls Category");
-    let categoryurls = await filterUrls(page, await fetchUrls(page, "li a"), url, "category");
+    let categoryurls = await filterUrls(
+      page,
+      await fetchUrls(page, "li a"),
+      url,
+      "category"
+    );
     categoryurls = await removeDuplicates(categoryurls);
 
     console.log("Fetching urls Articles");
-    let articleurls = await filterUrls(page, await fetchUrls(page, "a"), url, "article");
+    let articleurls = await filterUrls(
+      page,
+      await fetchUrls(page, "a"),
+      url,
+      "article"
+    );
     articleurls = await removeDuplicates(articleurls);
 
     let articleUrl, categoryUrl;
@@ -153,62 +165,65 @@ export default async function handler(req, res) {
       console.log("Opening url Category");
       const page2 = await browser.newPage();
       categoryUrl = await random(categoryurls);
-      await page2.goto(categoryUrl, { timeout: 90000, waitUntil: "domcontentloaded" });
-      await new Promise(r => setTimeout(r, 2000));
-      // if (await page2.$("iframe[src*='Advertisement']")) {
-      await page2.screenshot({ path: `./data/${domain}/category.png`, fullPage: true });
+      await page2.goto(categoryUrl, { waitUntil: "load", timeout: 0 });
+      await page2.screenshot({
+        path: `./data/${domain}/category.png`,
+        fullPage: true,
+      });
       await page2.setViewport({ width: 375, height: 667 });
-      await page2.reload({ timeout: 90000, waitUntil: "domcontentloaded" });
-      await new Promise(r => setTimeout(r, 2000));
-      await page2.screenshot({ path: `./data/${domain}/category_mobile.png`, fullPage: true });
-      // } else {
-      //   console.log("No ads found in category page");
-      //   categoryurls = [];
-      //   console.log(categoryurls);
-      // }
+      await page2.reload({ waitUntil: "load", timeout: 0 });
+      await new Promise((r) => setTimeout(r, 2000));
+      await page2.screenshot({
+        path: `./data/${domain}/category_mobile.png`,
+        fullPage: true,
+      });
     }
 
     if (articleurls.length > 0) {
       console.log("Opening url Article");
       const page3 = await browser.newPage();
       articleUrl = await random(articleurls);
-      await page3.goto(articleUrl, { timeout: 90000, waitUntil: "domcontentloaded" });
-      await new Promise(r => setTimeout(r, 2000));
-      // if (await page3.$("iframe[src*='Advertisement']")) {
-      await page3.screenshot({ path: `./data/${domain}/article.png`, fullPage: true });
+      await page3.goto(articleUrl, { waitUntil: "load", timeout: 0 });
+      await page3.screenshot({
+        path: `./data/${domain}/article.png`,
+        fullPage: true,
+      });
       await page3.setViewport({ width: 375, height: 667 });
-      await page3.reload({ timeout: 90000, waitUntil: "domcontentloaded" });
-      await new Promise(r => setTimeout(r, 2000));
-      await page3.screenshot({ path: `./data/${domain}/article_mobile.png`, fullPage: true });
-      // } else {
-      //   console.log("No ads found in category page");
-      //   articleurls = [];
-      //   console.log(articleurls);
-      // }
+      await page3.reload({ waitUntil: "load", timeout: 0 });
+      await new Promise((r) => setTimeout(r, 2000));
+      await page3.screenshot({
+        path: `./data/${domain}/article_mobile.png`,
+        fullPage: true,
+      });
     }
     await browser.close();
     console.log("Done");
-    res
-      .status(200)
-      .json({
-        socialLinks: socialLinks,
-        privacyPolicy: privacyPolicy,
-        termsAndConditions: termsAndConditions,
-        homepageUrl: `https://${url}`,
-        categoryUrl: categoryurls.length > 0 ? categoryUrl : "Not Found",
-        articleUrl: articleurls.length > 0 ? articleUrl : "Not Found",
-        similarWebData: similarWebData,
-      });
+    res.status(200).json({
+      socialLinks: socialLinks,
+      privacyPolicy: privacyPolicy,
+      termsAndConditions: termsAndConditions,
+      homepageUrl: `https://${url}`,
+      categoryUrl: categoryurls.length > 0 ? categoryUrl : "Not Found",
+      articleUrl: articleurls.length > 0 ? articleUrl : "Not Found",
+      similarWebData: similarWebData,
+    });
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
+    try {
+      await page.screenshot({ path: `./data/error.png`, fullPage: true });
+    } catch (error) {
+      console.log(error.message);
+    }
     res.status(404).json({ error: error.message });
-    await page.screenshot({ path: `./data/error.png`, fullPage: true });
   }
 }
 
 async function fetchUrls(page, locator) {
   try {
-    await page.waitForSelector(`${locator}`, { state: "attached", timeout: 5000 });
+    await page.waitForSelector(`${locator}`, {
+      state: "attached",
+      timeout: 5000,
+    });
   } catch (error) {
     await page.waitForSelector(`a`, { state: "attached", timeout: 5000 });
   }
@@ -321,14 +336,16 @@ async function filterUrls(page, urls, domain, pageFilter) {
       break;
 
     case "article":
-      filteredUrls = await filteredUrls.filter(url => {
+      filteredUrls = await filteredUrls.filter((url) => {
         if (url.endsWith("/")) {
           url = url.slice(0, -1);
         }
         const urlParts = url.split("/");
         const lastPart = urlParts[urlParts.length - 1];
-        if (url.split("/").slice(3).join("/").length >= 30 ||
-          /^[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\d]*$/g.test(lastPart)) {
+        if (
+          url.split("/").slice(3).join("/").length >= 30 ||
+          /^[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\d]*$/g.test(lastPart)
+        ) {
           if (
             !url.includes("category") &&
             !url.includes("tag") &&
