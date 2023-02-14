@@ -7,7 +7,7 @@ let flag = 0;
 
 export default async function handler(req, res) {
   const { siteCrawler } = req.query;
-  let page, similarWebData;
+  let page, similarWebData, securi;
   try {
     console.log("Puppeteer is running", siteCrawler);
     const browser = await puppeteer.launch({
@@ -27,8 +27,7 @@ export default async function handler(req, res) {
         "--disable-sync",
         "--disable-translate",
       ],
-      userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
+      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
       headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     });
@@ -36,6 +35,33 @@ export default async function handler(req, res) {
     const url = siteCrawler.replace(/^https?:\/\//, "").replace("www.", "");
     let domain = url.split(".");
     domain = domain[domain.length - 2];
+
+    // Fetch sitecheck.securi.net data
+    console.log("Fetching sitecheck.securi.net data for ", url);
+    let headersList = {
+      "Accept": "*/*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
+    };
+
+    securi = await fetch(`https://sitecheck.sucuri.net/api/v3/?scan=${url}`, {
+      method: "GET",
+      headers: headersList
+    });
+
+    securi = await securi.json();
+    if (securi.ratings.total.rating == "A") {
+      securi = "minimal";
+    } else if (securi.ratings.total.rating == "B") {
+      securi = "low";
+    } else if (securi.ratings.total.rating == "C") {
+      securi = "medium";
+    } else if (securi.ratings.total.rating == "D") {
+      securi = "high";
+    } else if (securi.ratings.total.rating == "E") {
+      securi = "critical";
+    } else {
+      securi = "unknown";
+    }
 
     console.log("Fetching similar web data for ", url);
     await page.goto(`https://data.similarweb.com/api/v1/data?domain=${url}`, {
@@ -206,6 +232,7 @@ export default async function handler(req, res) {
       categoryUrl: categoryurls.length > 0 ? categoryUrl : "Not Found",
       articleUrl: articleurls.length > 0 ? articleUrl : "Not Found",
       similarWebData: similarWebData,
+      securiData: securi
     });
   } catch (error) {
     console.log(error.message);

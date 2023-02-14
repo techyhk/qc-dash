@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  useTheme,
   Image,
   Spacer,
   Text,
@@ -8,11 +9,13 @@ import {
   Modal,
   Loading,
   Grid,
+  Badge,
   Card,
 } from "@nextui-org/react";
 import { useUser } from "../lib/hooks";
+import { SecurityIcon } from "../public/icon/securityIcon";
 import { Chart as ChartJS, registerables, scales } from "chart.js";
-import { Bar, Line, Pie } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 ChartJS.register(...registerables);
 
 const buttonCss = {
@@ -254,6 +257,21 @@ const Details = (props) => {
   TopCountrySharesData.labels = [];
   TopCountrySharesData.datasets[0].data = [];
 
+  function securiStatus(status) {
+    switch (status) {
+      case "minimal":
+        return "success";
+      case "low":
+        return "success";
+      case "medium":
+        return "warning";
+      case "high":
+        return "error";
+      case "critical":
+        return "error";
+    }
+  }
+
   return (
     <>
       {Object.keys(props.data.similarWebData.EstimatedMonthlyVisits).forEach(
@@ -270,30 +288,47 @@ const Details = (props) => {
           props.data.similarWebData.TrafficSources[key] * 100
         );
       })}
-      {Object.keys(props.data.similarWebData.TopCountryShares).forEach((key) => {
-        TopCountrySharesData.labels.push(
-          similarWebCountryData[
-          props.data.similarWebData.TopCountryShares[key].Country
-          ]
-        );
-        TopCountrySharesData.datasets[0].data.push(
-          props.data.similarWebData.TopCountryShares[key].Value * 100
-        );
-        totalCountryShares =
-          totalCountryShares +
-          props.data.similarWebData.TopCountryShares[key].Value * 100;
-      })}
+      {Object.keys(props.data.similarWebData.TopCountryShares).forEach(
+        (key) => {
+          TopCountrySharesData.labels.push(
+            similarWebCountryData[
+              props.data.similarWebData.TopCountryShares[key].Country
+            ]
+          );
+          TopCountrySharesData.datasets[0].data.push(
+            props.data.similarWebData.TopCountryShares[key].Value * 100
+          );
+          totalCountryShares =
+            totalCountryShares +
+            props.data.similarWebData.TopCountryShares[key].Value * 100;
+        }
+      )}
       <Spacer y={2} />
-      <Text
-        h2
-        css={{
-          textGradient: "45deg, #4ee1ff -20.3%, #0037f5 70.46%",
-        }}
-        weight="bold"
+      <Badge
+        variant="flat"
+        size="lg"
+        color={securiStatus(props.data.securiData)}
+        content={
+          <>
+            <SecurityIcon />
+            {(
+              props.data.securiData.charAt(0).toUpperCase() +
+              props.data.securiData.slice(1)
+            ).replace(/_/g, " ")}
+          </>
+        }
       >
-        {" "}
-        Website : {props.data.similarWebData.SiteName}
-      </Text>
+        <Text
+          h2
+          css={{
+            textGradient: "45deg, #4ee1ff -20.3%, #0037f5 70.46%",
+            paddingTop: "0.5rem",
+          }}
+          weight="bold"
+        >
+          Website : {props.data.similarWebData.SiteName}
+        </Text>
+      </Badge>
       <Spacer y={1} />
       <Grid.Container gap={2} justify="center">
         {Object.keys(props.data.socialLinks).map((url) => {
@@ -315,23 +350,25 @@ const Details = (props) => {
         <Grid>
           <Text>
             Privacy Policy :{" "}
-            {props.data.privacyPolicy.includes("No") ?
-              (<Text color="error">{props.data.privacyPolicy}</Text>) :
+            {props.data.privacyPolicy.includes("No") ? (
+              <Text color="error">{props.data.privacyPolicy}</Text>
+            ) : (
               <Link href={props.data.privacyPolicy} target="_blank">
                 {props.data.privacyPolicy}
               </Link>
-            }
+            )}
           </Text>
         </Grid>
         <Grid>
           <Text>
             Terms and conditions :{" "}
-            {props.data.termsAndConditions.includes("No") ?
-              (<Text color="error">{props.data.termsAndConditions}</Text>) :
+            {props.data.termsAndConditions.includes("No") ? (
+              <Text color="error">{props.data.termsAndConditions}</Text>
+            ) : (
               <Link href={props.data.termsAndConditions} target="_blank">
                 {props.data.termsAndConditions}
               </Link>
-            }
+            )}
           </Text>
         </Grid>
         <Spacer y={1} />
@@ -345,9 +382,9 @@ const Details = (props) => {
               Bounce Rate
               <br />
               <Text b size={20}>
-                {(props.data.similarWebData?.Engagments?.BounceRate * 100).toFixed(
-                  2
-                )}{" "}
+                {(
+                  props.data.similarWebData?.Engagments?.BounceRate * 100
+                ).toFixed(2)}{" "}
                 %
               </Text>
             </Text>
@@ -357,9 +394,9 @@ const Details = (props) => {
               Page Per Visit
               <br />
               <Text b size={20}>
-                {(props.data.similarWebData?.Engagments?.PagePerVisit * 1).toFixed(
-                  2
-                )}
+                {(
+                  props.data.similarWebData?.Engagments?.PagePerVisit * 1
+                ).toFixed(2)}
               </Text>
             </Text>
           </Grid>
@@ -368,9 +405,9 @@ const Details = (props) => {
               Visits
               <br />
               <Text b size={20}>
-                {(props.data.similarWebData?.Engagments?.Visits / 1000000).toFixed(
-                  2
-                )}{" "}
+                {(
+                  props.data.similarWebData?.Engagments?.Visits / 1000000
+                ).toFixed(2)}{" "}
                 M
               </Text>
             </Text>
@@ -381,17 +418,26 @@ const Details = (props) => {
               <br />
               <Text b size={20}>
                 {(
-                  ((Object.values(props.data.similarWebData.EstimatedMonthlyVisits)[
-                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)
-                      .length - 1
+                  ((Object.values(
+                    props.data.similarWebData.EstimatedMonthlyVisits
+                  )[
+                    Object.values(
+                      props.data.similarWebData.EstimatedMonthlyVisits
+                    ).length - 1
                   ] -
-                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)[
-                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)
-                      .length - 2
+                    Object.values(
+                      props.data.similarWebData.EstimatedMonthlyVisits
+                    )[
+                      Object.values(
+                        props.data.similarWebData.EstimatedMonthlyVisits
+                      ).length - 2
                     ]) /
-                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)[
-                    Object.values(props.data.similarWebData.EstimatedMonthlyVisits)
-                      .length - 2
+                    Object.values(
+                      props.data.similarWebData.EstimatedMonthlyVisits
+                    )[
+                      Object.values(
+                        props.data.similarWebData.EstimatedMonthlyVisits
+                      ).length - 2
                     ]) *
                   100
                 ).toFixed(2)}{" "}
@@ -449,7 +495,7 @@ const Details = (props) => {
         {Object.keys(screenshot).map((key) => {
           return (
             <div key={key}>
-              {screenshot[key].url != "Not Found" ?
+              {screenshot[key].url != "Not Found" ? (
                 <Grid key={key}>
                   <Text b size={15}>
                     {key.toUpperCase()} :{" "}
@@ -483,7 +529,8 @@ const Details = (props) => {
                   >
                     View Screenshot
                   </Button>
-                </Grid> : null}
+                </Grid>
+              ) : null}
             </div>
           );
         })}
@@ -530,37 +577,7 @@ const Details = (props) => {
 };
 
 const myLoader = (src) => {
-  console.log(process.env.CHROME_PATH);
-  return `http://170.187.232.198:8000/${src}`;
+  return `http://${process.env.HOSTNAME}:8000/${src}`;
 };
 
 export default Details;
-
-// Go to website and fetch social urls
-const getSocialUrls = async (url) => {
-  const res = await fetch(`http://` + url);
-  const html = await res.text();
-  const $ = cheerio.load(html);
-  const socialUrls = {};
-  $("a").each((i, el) => {
-    const href = $(el).attr("href");
-    if (href) {
-      if (href.includes("facebook")) {
-        socialUrls.facebook = href;
-      }
-      if (href.includes("twitter")) {
-        socialUrls.twitter = href;
-      }
-      if (href.includes("instagram")) {
-        socialUrls.instagram = href;
-      }
-      if (href.includes("linkedin")) {
-        socialUrls.linkedin = href;
-      }
-      if (href.includes("youtube")) {
-        socialUrls.youtube = href;
-      }
-    }
-  });
-  return socialUrls;
-};
