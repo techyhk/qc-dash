@@ -182,6 +182,10 @@ const similarWebCountryData = {
   818: "Egypt",
   566: "Nigeria",
   144: "Sri Lanka",
+  170: "Colombia",
+  484: "Mexico",
+  604: "Peru",
+  591: "Panama",
 };
 
 const Details = (props) => {
@@ -292,7 +296,7 @@ const Details = (props) => {
         (key) => {
           TopCountrySharesData.labels.push(
             similarWebCountryData[
-              props.data.similarWebData.TopCountryShares[key].Country
+            props.data.similarWebData.TopCountryShares[key].Country
             ]
           );
           TopCountrySharesData.datasets[0].data.push(
@@ -428,16 +432,16 @@ const Details = (props) => {
                     Object.values(
                       props.data.similarWebData.EstimatedMonthlyVisits
                     )[
-                      Object.values(
-                        props.data.similarWebData.EstimatedMonthlyVisits
-                      ).length - 2
+                    Object.values(
+                      props.data.similarWebData.EstimatedMonthlyVisits
+                    ).length - 2
                     ]) /
                     Object.values(
                       props.data.similarWebData.EstimatedMonthlyVisits
                     )[
-                      Object.values(
-                        props.data.similarWebData.EstimatedMonthlyVisits
-                      ).length - 2
+                    Object.values(
+                      props.data.similarWebData.EstimatedMonthlyVisits
+                    ).length - 2
                     ]) *
                   100
                 ).toFixed(2)}{" "}
