@@ -6,8 +6,6 @@ import Details from "../components/details";
 import axios from "axios";
 import { SSRProvider } from "react-bootstrap";
 
-let socialUrls = {};
-
 const Home = () => {
   const user = useUser({ redirectTo: "/login" });
   const [search, setSearch] = React.useState("");
@@ -16,7 +14,6 @@ const Home = () => {
   const [data, setData] = React.useState({});
   const [error, setError] = React.useState("");
   const [inputState, setInputState] = React.useState("enabled");
-  const [similarWebData, setSimilarWebData] = React.useState(null);
 
   const searchHandler = (e) => {
     setSearch(e.target.value);
@@ -43,7 +40,6 @@ const Home = () => {
                   clearable={inputState === "disabled" ? false : true}
                   color="warning"
                   onChange={searchHandler}
-                  value={search}
                   aria-label="Search"
                   rounded
                   size="lg"
