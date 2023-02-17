@@ -395,6 +395,17 @@ const Details = (props) => {
           </Grid>
           <Grid>
             <Text size={15}>
+              Page Views
+              <br />
+              <Text b size={20}>
+                {(
+                  (props.data.similarWebData?.Engagments?.PagePerVisit * props.data.similarWebData?.Engagments?.Visits) / 1000000
+                ).toFixed(3)} M
+              </Text>
+            </Text>
+          </Grid>
+          <Grid>
+            <Text size={15}>
               Page Per Visit
               <br />
               <Text b size={20}>
