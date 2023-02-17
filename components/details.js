@@ -307,7 +307,7 @@ const Details = (props) => {
             props.data.similarWebData.TopCountryShares[key].Value * 100;
         }
       )}
-      <Spacer y={2} />
+      <Spacer y={1.5} />
       <Badge
         variant="flat"
         size="lg"
@@ -334,53 +334,23 @@ const Details = (props) => {
         </Text>
       </Badge>
       <Spacer y={1} />
-      <Grid.Container gap={2} justify="center">
-        {Object.keys(props.data.socialLinks).map((url) => {
-          return (
-            <Grid key={url}>
-              <Link href={props.data.socialLinks[url]} target="_blank">
-                <img
-                  src={`/social/${url}.svg`}
-                  alt={url}
-                  width={30}
-                  height={"auto"}
-                />
-              </Link>
-            </Grid>
-          );
-        })}
-      </Grid.Container>
-      <Grid.Container gap={2} justify="center">
-        <Grid>
-          <Text>
-            Privacy Policy :{" "}
-            {props.data.privacyPolicy.includes("No") ? (
-              <Text color="error">{props.data.privacyPolicy}</Text>
-            ) : (
-              <Link href={props.data.privacyPolicy} target="_blank">
-                {props.data.privacyPolicy}
-              </Link>
-            )}
-          </Text>
-        </Grid>
-        <Grid>
-          <Text>
-            Terms and conditions :{" "}
-            {props.data.termsAndConditions.includes("No") ? (
-              <Text color="error">{props.data.termsAndConditions}</Text>
-            ) : (
-              <Link href={props.data.termsAndConditions} target="_blank">
-                {props.data.termsAndConditions}
-              </Link>
-            )}
-          </Text>
-        </Grid>
-        <Spacer y={1} />
-      </Grid.Container>
-      <Spacer y={2} />
       <Card isHoverable css={{ mw: "1200px", p: "$10" }}>
         <Text h4>Traffic & Engagement Last Month</Text>
         <Grid.Container gap={5} justify="center">
+          <Grid>
+            <Text size={15}>
+              Tier
+              <br />
+              <Text b size={20}>
+                {props.data.similarWebData?.Engagments?.Visits > 2500000
+                  ? "Tier 1"
+                  : props.data.similarWebData?.Engagments?.Visits > 500000 &&
+                    props.data.similarWebData?.Engagments?.Visits > 2500000
+                    ? "Tier 2"
+                    : "Tier 3"}
+              </Text>
+            </Text>
+          </Grid>
           <Grid>
             <Text size={15}>
               Bounce Rate
@@ -399,12 +369,15 @@ const Details = (props) => {
               <br />
               <Text b size={20}>
                 {(
-                  (props.data.similarWebData?.Engagments?.PagePerVisit * props.data.similarWebData?.Engagments?.Visits) / 1000000
-                ).toFixed(3)} M
+                  (props.data.similarWebData?.Engagments?.PagePerVisit *
+                    props.data.similarWebData?.Engagments?.Visits) /
+                  1000000
+                ).toFixed(3)}{" "}
+                M
               </Text>
             </Text>
           </Grid>
-          <Grid>
+          {/*           <Grid>
             <Text size={15}>
               Page Per Visit
               <br />
@@ -426,7 +399,7 @@ const Details = (props) => {
                 M
               </Text>
             </Text>
-          </Grid>
+          </Grid> */}
           <Grid>
             <Text size={15}>
               Last Month Change
@@ -475,12 +448,10 @@ const Details = (props) => {
 
         <Grid.Container gap={1} justify="space-evenly">
           <Grid>
-            <Spacer y={2} />
             <Text h4>Traffic Sources</Text>
             <Pie data={trafficSourcesData} width={300} height={300} />
           </Grid>
           <Grid>
-            <Spacer y={2} />
             <Text h4>Total Visits Last 3 Months</Text>
             <div>
               <Bar
@@ -492,7 +463,6 @@ const Details = (props) => {
             </div>
           </Grid>
           <Grid>
-            <Spacer y={2} />
             <Text h4>Geography & Country Targeting</Text>
             {totalCountryShares < 100
               ? (TopCountrySharesData.labels.push("Others"),
@@ -503,53 +473,100 @@ const Details = (props) => {
             <Pie data={TopCountrySharesData} width={300} height={300} />
           </Grid>
         </Grid.Container>
+        <Grid.Container gap={2} justify="center">
+          {Object.keys(props.data.socialLinks).map((url) => {
+            return (
+              <Grid key={url}>
+                <Link href={props.data.socialLinks[url]} target="_blank">
+                  <img
+                    src={`/social/${url}.svg`}
+                    alt={url}
+                    width={30}
+                    height={"auto"}
+                  />
+                </Link>
+              </Grid>
+            );
+          })}
+        </Grid.Container>
+        <Grid.Container gap={2} justify="center">
+          <Grid>
+            <Text>
+              Privacy Policy :{" "}
+              {props.data.privacyPolicy.includes("No") ? (
+                <Text color="error">{props.data.privacyPolicy}</Text>
+              ) : (
+                <Link href={props.data.privacyPolicy} target="_blank">
+                  {props.data.privacyPolicy}
+                </Link>
+              )}
+            </Text>
+          </Grid>
+          <Grid>
+            <Text>
+              Terms and conditions :{" "}
+              {props.data.termsAndConditions.includes("No") ? (
+                <Text color="error">{props.data.termsAndConditions}</Text>
+              ) : (
+                <Link href={props.data.termsAndConditions} target="_blank">
+                  {props.data.termsAndConditions}
+                </Link>
+              )}
+            </Text>
+          </Grid>
+          <Spacer y={1} />
+        </Grid.Container>
       </Card>
-      <Spacer y={2} />
-      <Text h3>Page Screenshots</Text>
-      <Grid.Container gap={2} justify="center">
-        {Object.keys(screenshot).map((key) => {
-          return (
-            <div key={key}>
-              {screenshot[key].url != "Not Found" ? (
-                <Grid key={key}>
-                  <Text b size={15}>
-                    {key.toUpperCase()} :{" "}
-                    <Link href={screenshot[key].url} target="_blank">
-                      Go to Link
-                    </Link>
-                  </Text>
-                  <Spacer y="1" />
-                  <Text>Desktop</Text>
-                  <Button
-                    auto
-                    css={buttonCss}
-                    onPress={() => {
-                      setScreenshotData(null);
-                      setScreenshotModalIsOpen(true);
-                      setScreenshotData(screenshot[key].desktopScreenShot);
-                    }}
-                  >
-                    View Screenshot
-                  </Button>
-                  <Spacer y="1" />
-                  <Text>Mobile</Text>
-                  <Button
-                    auto
-                    css={buttonCss}
-                    onPress={() => {
-                      setScreenshotData(null);
-                      setScreenshotModalIsOpen(true);
-                      setScreenshotData(screenshot[key].mobileScreenShot);
-                    }}
-                  >
-                    View Screenshot
-                  </Button>
-                </Grid>
-              ) : null}
-            </div>
-          );
-        })}
-      </Grid.Container>
+
+      <Spacer y={1} />
+      <Card isHoverable css={{ mw: "1200px", p: "$10" }}>
+        <Text h3>Page Screenshots</Text>
+        <Grid.Container gap={2} justify="center">
+          {Object.keys(screenshot).map((key) => {
+            return (
+              <div key={key}>
+                {screenshot[key].url != "Not Found" ? (
+                  <Grid key={key}>
+                    <Text b size={15}>
+                      {key.toUpperCase()} :{" "}
+                      <Link href={screenshot[key].url} target="_blank">
+                        Go to Link
+                      </Link>
+                    </Text>
+                    <Spacer y="1" />
+                    <Text>Desktop</Text>
+                    <Button
+                      auto
+                      type
+                      css={buttonCss}
+                      onPress={() => {
+                        setScreenshotData(null);
+                        setScreenshotModalIsOpen(true);
+                        setScreenshotData(screenshot[key].desktopScreenShot);
+                      }}
+                    >
+                      View Screenshot
+                    </Button>
+                    <Spacer y="1" />
+                    <Text>Mobile</Text>
+                    <Button
+                      auto
+                      css={buttonCss}
+                      onPress={() => {
+                        setScreenshotData(null);
+                        setScreenshotModalIsOpen(true);
+                        setScreenshotData(screenshot[key].mobileScreenShot);
+                      }}
+                    >
+                      View Screenshot
+                    </Button>
+                  </Grid>
+                ) : null}
+              </div>
+            );
+          })}
+        </Grid.Container>
+      </Card>
 
       <Modal
         autoMargin
