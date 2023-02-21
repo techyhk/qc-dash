@@ -139,7 +139,6 @@ const similarWebCountryData = {
   410: "South Korea",
   344: "Hong Kong",
   446: "Macau",
-  702: "Singapore",
   840: "United States",
   682: "Saudi Arabia",
   784: "United Arab Emirates",
@@ -186,6 +185,12 @@ const similarWebCountryData = {
   484: "Mexico",
   604: "Peru",
   591: "Panama",
+  764: "Thailand",
+  118: "Cambodia",
+  188: "Costa Rica",
+  32: "Argentina",
+  104: "Myanmar",
+  360: "Indonesia",
 };
 
 const Details = (props) => {
@@ -193,6 +198,8 @@ const Details = (props) => {
   const [screenshotModalIsOpen, setScreenshotModalIsOpen] =
     React.useState(false);
   const [screenshotData, setScreenshotData] = React.useState(null);
+  const pageViews = ((props.data.similarWebData?.Engagments?.PagePerVisit *
+    props.data.similarWebData?.Engagments?.Visits));
 
   let domain = props.site.replace(/(^\w+:|^)\/\//, "").replace("www.", "");
   domain = domain.split(".")[0];
@@ -342,10 +349,10 @@ const Details = (props) => {
               Tier
               <br />
               <Text b size={20}>
-                {props.data.similarWebData?.Engagments?.Visits > 2500000
+                {pageViews > 2500000
                   ? "Tier 1"
-                  : props.data.similarWebData?.Engagments?.Visits > 500000 &&
-                    props.data.similarWebData?.Engagments?.Visits > 2500000
+                  : pageViews > 500000 &&
+                    pageViews < 2500000
                     ? "Tier 2"
                     : "Tier 3"}
               </Text>
@@ -368,12 +375,7 @@ const Details = (props) => {
               Page Views
               <br />
               <Text b size={20}>
-                {(
-                  (props.data.similarWebData?.Engagments?.PagePerVisit *
-                    props.data.similarWebData?.Engagments?.Visits) /
-                  1000000
-                ).toFixed(3)}{" "}
-                M
+                {(pageViews / 1000000).toFixed(3)} M
               </Text>
             </Text>
           </Grid>
